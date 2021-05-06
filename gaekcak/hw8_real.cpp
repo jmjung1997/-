@@ -40,7 +40,7 @@ public:
     void InputValue(int&);
     void InputValue(string&);
     void InputData(); // 멤버변수 값 입력
-    void PrintData(); // 멤버변수 값 출력
+    void printData(); // 멤버변수 값 출력
     void CalcAveGPA(); // 평균 평점 계산
 
     string GetName(); 
@@ -58,30 +58,18 @@ protected:
 
 int main()
 {
-    Subject sub1, sub2, sub3[2], * sub4;
-    int i;
-    sub1.Initialize();
-    sub2.Initialize("사진학", 3, "A+");
-    for (i = 0; i < 2; i++)
-    {
-        sub3[i].Initialize("컴퓨터", 3, "A0");
-
-    }
-
-    sub4 = new Subject[2];
-    sub1.InputData(); // 화면에서 입력
-    cout << "\n" << "sub1 정보" << "\n";
-    sub1.printTitle(); sub1.printData();
-    cout << "\n" << "sub2 정보" << "\n";
-    sub2.printTitle(); sub2.printData();
-    cout << "\n" << "sub3 정보" << "\n";
-    sub3[0].printTitle();
-    for (i = 0; i < 2; i++) sub3[i].printData();
-    for (i = 0; i < 2; i++) (sub4 + i)->InputData();
-    cout << "\n" << "sub4 정보" << "\n";
-    sub4->printTitle();
-    for (i = 0; i < 2; i++) (sub4 + i)->printData();
-    delete[] sub4;
+    Subject sub[2];
+    sub[0].Initialize("컴퓨터", 3, "C0");
+    sub[1].Initialize("현대무용", 2, "A0");
+    Student st1, st2;
+    st1.Initialize();
+    st2.Initialize("홍길동", 2013909845, 2, sub);
+    st1.InputData();
+    cout << "\n" << "st1 정보" << "\n";
+    st1.printData();
+    cout << "\n" << "st2 정보" << "\n";
+    st2.printData();
+    st1.Remove();
 
 }
 
@@ -91,6 +79,7 @@ void Student::Initialize()
     m_Hakbun = 0; // 학번 
     m_Subnumber = 0;//학생별 선택 과목수
     m_Sub = NULL; // 과목 
+    m_AveGPA=0.0f;//평균 평점 초기화
 
 }
 
@@ -130,7 +119,7 @@ void Subject::InputData() //과목의 정보를 입력 받는함수
     InputValue(m_name);
     cout << "과목학점: ";
     InputValue(m_Hakjum);
-    cout << "과목등급<A+ ~F>: ";
+    cout << "과목등급<A+ ~F>: ";      
     InputValue(m_Grade);
     cout << "\n\n";
     CalcGPA();
@@ -148,7 +137,7 @@ void Student::InputData()
     m_Sub = new Subject[m_Subnumber]; // 각 학생별 객체 안에 과목 객체배열을 입력받은 과목수로 동적배열을 통해 생성한다.
     for (int i = 0; i < m_Subnumber; i++)
     {
-        m_Sub[i].Subject::InputData();
+        (m_Sub+i)->Subject::InputData();
     }
     CalcAveGPA();
 }
@@ -262,6 +251,29 @@ void Subject::printData()
     cout.width(10);
     cout << m_GPA;
     cout << "\n";
+}
+void Student::printData()
+{
+    cout << "\n\n";
+    cout.width(10);
+    cout << m_StdName;
+    cout.width(10);
+    cout << m_Hakbun; 
+    
+    m_Sub->Subject::printTitle();
+    for (int i = 0; i < m_Subnumber; i++)
+    {
+        (m_Sub + i)->Subject::printData();
+    }
+    line();
+    cout << "\n";
+    cout.width(30);
+    cout << "평균평점";
+    cout.width(10);
+    cout.precision(2);
+    cout << fixed;
+    cout << m_AveGPA; //rst에 해당하는 학생 평균 학점 출력하기
+    cout << "\n\n\n\n";
 }
 
 void Student::Remove()
