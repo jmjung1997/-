@@ -8,8 +8,6 @@ float number_grade(string grade);
 
 
 
-
-
 class Subject
 {
 public:
@@ -23,6 +21,10 @@ public:
     void printData();
     void CalcGPA();
 
+    string GetName();
+    int GetHakjum();
+    string GetGrade();
+    float GetGPA();
 protected:
     string m_name;        // 과목이름 
     int m_Hakjum;                   // 과목학점 
@@ -30,21 +32,43 @@ protected:
     float m_GPA;                    // 과목 평점 
 };
 
+class Student {// 학생 정보 
+public:
+    void Initialize(); // 멤버변수 초기화
+    void Initialize(string, int, int, Subject*); // 인자값으로 멤버변수 초기화
+    void Remove(); // 동적메모리 해제 (m_sub)
+    void InputValue(int&);
+    void InputValue(string&);
+    void InputData(); // 멤버변수 값 입력
+    void PrintData(); // 멤버변수 값 출력
+    void CalcAveGPA(); // 평균 평점 계산
+
+    string GetName(); 
+    int GetHakbun(); 
+    int GetSubNum(); 
+    float GetAveGPA();
+
+protected:
+    string m_StdName; // 학생이름 
+    int m_Hakbun; // 학번 
+    Subject* m_Sub; // 과목 
+    float m_AveGPA;   // 교과목 평균 평점 
+    int m_Subnumber;//학생별 선택 과목수
+};
+
 int main()
 {
-    Subject sub1, sub2, sub3[2], *sub4;
+    Subject sub1, sub2, sub3[2], * sub4;
     int i;
-
     sub1.Initialize();
     sub2.Initialize("사진학", 3, "A+");
     for (i = 0; i < 2; i++)
     {
         sub3[i].Initialize("컴퓨터", 3, "A0");
-        
-    }
-    
-    sub4 = new Subject[2];
 
+    }
+
+    sub4 = new Subject[2];
     sub1.InputData(); // 화면에서 입력
     cout << "\n" << "sub1 정보" << "\n";
     sub1.printTitle(); sub1.printData();
@@ -59,16 +83,33 @@ int main()
     for (i = 0; i < 2; i++) (sub4 + i)->printData();
     delete[] sub4;
 
+}
 
+void Student::Initialize()
+{
+    m_StdName = " "; // 학생이름 
+    m_Hakbun = 0; // 학번 
+    m_Subnumber = 0;//학생별 선택 과목수
+    m_Sub = NULL; // 과목 
+
+}
+
+void Student::Initialize(string name, int Hakbun, int Subnum, Subject* sub)
+{
+    m_StdName = name; // 학생이름 
+    m_Hakbun = Hakbun; // 학번 
+    m_Subnumber = Subnum;//학생별 선택 과목수
+    m_Sub = sub; // 과목 
+    CalcAveGPA(); //평균평점 함수
 }
 
 void Subject::Initialize()
 {
-     m_name=" ";        // 과목이름 
-     m_Hakjum=0;                   // 과목학점 
-     m_Grade=" ";             // 과목등급 
-     m_GPA = 0.0f;
-    
+    m_name = " ";        // 과목이름 
+    m_Hakjum = 0;                   // 과목학점 
+    m_Grade = " ";             // 과목등급 
+    m_GPA = 0.0f;
+
 }
 
 void Subject::Initialize(string name, int Hakjum, string Grade)
@@ -79,21 +120,39 @@ void Subject::Initialize(string name, int Hakjum, string Grade)
     CalcGPA();
 }
 
-void Subject::InputData() //학생의 정보를 입력 받는함수
+
+
+void Subject::InputData() //과목의 정보를 입력 받는함수
 {
-        
-        cout << "*" << "수강한 과목의 각 교과목명, 과목학점, 과목등급을 입력하세요.\n";
-    
-            cout << "교과목명: ";
-            InputValue(m_name);
-            cout << "과목학점: ";
-            InputValue(m_Hakjum);
-            cout << "과목등급<A+ ~F>: ";
-            InputValue(m_Grade);
-            cout << "\n\n";
-            CalcGPA();
-     
+
+    cout << "*" << "수강한 과목의 각 교과목명, 과목학점, 과목등급을 입력하세요.\n";
+    cout << "교과목명: ";
+    InputValue(m_name);
+    cout << "과목학점: ";
+    InputValue(m_Hakjum);
+    cout << "과목등급<A+ ~F>: ";
+    InputValue(m_Grade);
+    cout << "\n\n";
+    CalcGPA();
+
 }
+
+void Student::InputData()
+{
+    cout << "이름 : ";
+    InputValue(m_StdName);//이름 넣기 
+    cout << "학번: ";
+    InputValue(m_Hakbun);//학번 넣기
+    cout << "수강한 과목 수를 입력 : "; //수강한 과목 수 입력
+    InputValue(m_Subnumber);
+    m_Sub = new Subject[m_Subnumber]; // 각 학생별 객체 안에 과목 객체배열을 입력받은 과목수로 동적배열을 통해 생성한다.
+    for (int i = 0; i < m_Subnumber; i++)
+    {
+        m_Sub[i].Subject::InputData();
+    }
+    CalcAveGPA();
+}
+
 
 void Subject::InputValue(string& str)//데이터를 입력 받는 함수 ,인라인함수 오버로딩
 {
@@ -107,7 +166,18 @@ void Subject::InputValue(int& i)//데이터를 입력 받는 함수 ,인라인함수 오버로딩
     cin >> i;
     cin.ignore();
 }
+void Student::InputValue(string& str)//데이터를 입력 받는 함수 ,인라인함수 오버로딩
+{
 
+    getline(cin, str);
+
+}
+
+void Student::InputValue(int& i)//데이터를 입력 받는 함수 ,인라인함수 오버로딩
+{
+    cin >> i;
+    cin.ignore();
+}
 
 void Subject::CalcGPA() //GPA성적 계산하는 함수, &Sub는 레퍼런스 함수 이므로 값으로 전달 받는다. 
 {
@@ -117,6 +187,22 @@ void Subject::CalcGPA() //GPA성적 계산하는 함수, &Sub는 레퍼런스 함수 이므로 값�
     m_GPA = score * m_Hakjum; // Score*학점을 통해 GPA를 계산한다.
 }
 
+
+void Student::CalcAveGPA() /* 평균 GPA 계산하기,이때 매개변수 *Sub이므로 주소값으로 호출한다.
+                                                   전체 학생 토탈 학점을 구하기 위해 Subnumber 값을 전달 받는다 */
+{
+    float tGPA = 0;
+    int tHakjum = 0;
+    for (int j = 0; j < m_Subnumber; j++)// 과목 전체 수 만큼 반복
+    {
+        tGPA += (m_Sub+j)->GetGPA(); // 각 과목 GPA 총 합 구하기      
+    }   
+    for (int i = 0; i < m_Subnumber; i++) // 해당 학생 전체 학점 수 구하기
+    {
+        tHakjum += (m_Sub + i)->GetHakjum();
+    }
+    m_AveGPA = (float)tGPA / tHakjum; // 전체 GPA를 전체 학점수로 나누어 평균 GPA 구하기 
+}
 
 float number_grade(string grade) //등급을 점수로 변환시켜 주는 함수
 {
@@ -168,19 +254,64 @@ void Subject::printTitle()
 void Subject::printData()
 {
     cout.width(10);
-    cout <<m_name;
+    cout << m_name;
     cout.width(10);
     cout << m_Hakjum;
     cout.width(10);
-    cout <<m_Grade;
+    cout << m_Grade;
     cout.width(10);
-    cout <<m_GPA;
+    cout << m_GPA;
     cout << "\n";
 }
 
-
+void Student::Remove()
+{
+    delete[]m_Sub;
+}
 
 void line()
 {
     cout << "\n============================================\n";
+}
+
+string Subject::GetName()
+{
+    return m_name;
+}
+
+
+int Subject::GetHakjum()
+{
+    return m_Hakjum;
+}
+
+string Subject::GetGrade()
+{
+    return m_Grade;
+}
+
+
+float Subject::GetGPA()
+{
+    return m_GPA;
+}
+
+string Student:: GetName()
+{
+    return m_StdName;
+}
+
+int Student::GetHakbun()
+{
+    return m_Hakbun;
+}
+
+int Student::GetSubNum()
+{
+    return  m_Subnumber;
+}
+
+float Student::GetAveGPA()
+{    
+    return m_AveGPA;
 }
